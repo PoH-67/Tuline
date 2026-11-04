@@ -43,13 +43,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <ResponsiveLayout
-      pageTitle="Daftar Akun Baru"
-      showBack
-      onBack={() => navigate('/login')}
-      hideTopNav
-      hideBottomNav
-    >
+    <ResponsiveLayout hideTopNav hideBottomNav showBack={false}>
       <div className="w-full flex-1 flex items-center justify-center p-4 sm:p-8">
         <div className="w-full max-w-md bg-[#ffde59] rounded-3xl p-6 sm:p-8 shadow-xl border border-yellow-300 flex flex-col justify-between text-[#0c1b33]">
           

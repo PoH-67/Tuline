@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -15,6 +15,24 @@ import OrdersListPage from './pages/OrdersListPage';
 import FavoritesPage from './pages/FavoritesPage';
 import NotificationsPage from './pages/NotificationsPage';
 import ProfilePage from './pages/ProfilePage';
+
+// Proteksi Rute: Jika belum login, WAJIB ke /login (tidak bisa kemana-mana)
+function ProtectedRoute({ children }) {
+  const { currentUser } = useAuth();
+  if (!currentUser) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+}
+
+// Khusus Login & Register: Jika sudah login, langsung lempar ke Beranda /
+function PublicOnlyRoute({ children }) {
+  const { currentUser } = useAuth();
+  if (currentUser) {
+    return <Navigate to="/" replace />;
+  }
+  return children;
+}
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -45,7 +63,7 @@ class ErrorBoundary extends Component {
             <button
               onClick={() => {
                 localStorage.clear();
-                window.location.href = '/';
+                window.location.href = '/login';
               }}
               className="w-full py-3 bg-[#ff7f11] text-white font-bold rounded-xl text-sm shadow hover:bg-[#e06d0b] transition"
             >
@@ -65,19 +83,115 @@ export default function App() {
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/order/new" element={<OrderCreatePage />} />
-            <Route path="/teknisi" element={<WorkerSearchPage />} />
-            <Route path="/teknisi/:id" element={<WorkerDetailPage />} />
-            <Route path="/pesanan" element={<OrdersListPage />} />
-            <Route path="/pesanan/:id" element={<OrderStatusPage />} />
-            <Route path="/pesanan/:id/invoice" element={<InvoicePage />} />
-            <Route path="/konsultasi-ai" element={<AiConsultationPage />} />
-            <Route path="/favorit" element={<FavoritesPage />} />
-            <Route path="/notifikasi" element={<NotificationsPage />} />
-            <Route path="/profil" element={<ProfilePage />} />
+            {/* Rute Awal Masuk (Hanya Bisa Diakses Jika Belum Login) */}
+            <Route
+              path="/login"
+              element={
+                <PublicOnlyRoute>
+                  <LoginPage />
+                </PublicOnlyRoute>
+              }
+            />
+            <Route
+              path="/register"
+              element={
+                <PublicOnlyRoute>
+                  <RegisterPage />
+                </PublicOnlyRoute>
+              }
+            />
+
+            {/* Rute Terproteksi: Semua Halaman Hanya Bisa Diakses Setelah Login */}
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <HomePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/order/new"
+              element={
+                <ProtectedRoute>
+                  <OrderCreatePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/teknisi"
+              element={
+                <ProtectedRoute>
+                  <WorkerSearchPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/teknisi/:id"
+              element={
+                <ProtectedRoute>
+                  <WorkerDetailPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/pesanan"
+              element={
+                <ProtectedRoute>
+                  <OrdersListPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/pesanan/:id"
+              element={
+                <ProtectedRoute>
+                  <OrderStatusPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/pesanan/:id/invoice"
+              element={
+                <ProtectedRoute>
+                  <InvoicePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/konsultasi-ai"
+              element={
+                <ProtectedRoute>
+                  <AiConsultationPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/favorit"
+              element={
+                <ProtectedRoute>
+                  <FavoritesPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/notifikasi"
+              element={
+                <ProtectedRoute>
+                  <NotificationsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profil"
+              element={
+                <ProtectedRoute>
+                  <ProfilePage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Jika Rute Tidak Dikenal, Redirect ke / (yang jika belum login akan dilempar ke /login) */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>
