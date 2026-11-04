@@ -62,7 +62,7 @@ export default function RegisterPage() {
                 to="/login"
                 className="text-[14px] font-bold text-[#030500] hover:text-[#ff7f11] transition"
               >
-                Sudah punya akun? Login
+              Login
               </Link>
             </div>
 
