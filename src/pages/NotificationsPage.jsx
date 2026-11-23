@@ -17,15 +17,15 @@ export default function NotificationsPage() {
     },
     {
       id: 2,
-      title: 'Top Up Saku BENERIN Berhasil',
-      desc: 'Saldo Saku BENERIN Anda telah bertambah dan siap digunakan untuk pemesanan teknisi.',
+      title: 'Top Up Saku TULINE Berhasil',
+      desc: 'Saldo Saku TULINE Anda telah bertambah dan siap digunakan untuk pemesanan teknisi.',
       time: '30 menit lalu',
       icon: Tag,
       color: 'text-orange-600 bg-orange-50',
     },
     {
       id: 3,
-      title: 'Konsultasi Kerusakan dengan AI Benerin',
+      title: 'Konsultasi Kerusakan dengan AI Tuline',
       desc: 'Tanyakan estimasi biaya dan diagnosa awal gratis sebelum memesan teknisi ke rumah.',
       time: 'Kemarin',
       icon: Sparkles,

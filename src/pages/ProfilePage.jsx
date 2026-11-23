@@ -231,7 +231,7 @@ export default function ProfilePage() {
               </button>
 
               <button
-                onClick={() => alert('Pusat Bantuan BENERIN: Silakan hubungi CS WhatsApp di 0812-3456-7890.')}
+                onClick={() => alert('Pusat Bantuan TULINE: Silakan hubungi CS WhatsApp di 0812-3456-7890.')}
                 className="flex items-center justify-between py-3 text-xs sm:text-sm font-bold text-[#0c1b33] hover:text-[#ff7f11] transition"
               >
                 <div className="flex items-center gap-3">

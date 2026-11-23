@@ -14,13 +14,13 @@ import {
   serverTimestamp,
 } from 'firebase/firestore';
 
-const LOCAL_USER_KEY = 'benerin_auth_user';
-const REGISTERED_ACCOUNTS_KEY = 'benerin_registered_accounts';
+const LOCAL_USER_KEY = 'tuline_auth_user';
+const REGISTERED_ACCOUNTS_KEY = 'tuline_registered_accounts';
 
 // Local storage helpers
 export const getLocalUser = () => {
   try {
-    const raw = localStorage.getItem(LOCAL_USER_KEY);
+    const raw = localStorage.getItem(LOCAL_USER_KEY) || localStorage.getItem('benerin_auth_user');
     return raw ? JSON.parse(raw) : null;
   } catch {
     return null;

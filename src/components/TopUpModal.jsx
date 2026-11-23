@@ -66,7 +66,7 @@ export default function TopUpModal({ isOpen, onClose }) {
             </div>
             <div>
               <h3 className="text-base font-bold text-gray-900 font-jakarta">
-                Top Up Saku BENER<span className="text-[#ff7f11]">IN</span>
+                Top Up Saku TUL<span className="text-[#ff7f11]">INE</span>
               </h3>
               <p className="text-[11px] text-gray-500">Saldo Anda: Rp {currentWallet.toLocaleString('id-ID')}</p>
             </div>

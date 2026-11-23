@@ -40,7 +40,7 @@ export default function OrderCreatePage() {
   
   // Catatan tambahan opsional
   const [notes, setNotes] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('Saku BENERIN');
+  const [paymentMethod, setPaymentMethod] = useState('Saku TULINE');
   
   // Foto unit WAJIB
   const [photoPreview, setPhotoPreview] = useState(null);
@@ -427,7 +427,7 @@ export default function OrderCreatePage() {
                     </div>
                     <div>
                       <span className="text-xs font-extrabold text-black block leading-tight">
-                        Saku BENER<span className="text-[#ff7f11]">IN</span>
+                        Saku TUL<span className="text-[#ff7f11]">INE</span>
                       </span>
                       <span className="text-[11px] text-gray-600">
                         Saldo: Rp {(currentUser?.walletBalance || 0).toLocaleString('id-ID')}

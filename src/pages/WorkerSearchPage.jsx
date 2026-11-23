@@ -15,7 +15,7 @@ export default function WorkerSearchPage() {
   const date = searchParams.get('date') || '';
   const time = searchParams.get('time') || '';
   const notes = searchParams.get('notes') || '';
-  const payment = searchParams.get('payment') || 'Saku BENERIN';
+  const payment = searchParams.get('payment') || 'Saku TULINE';
   const querySearch = searchParams.get('q') || '';
 
   const [filterRating, setFilterRating] = useState(false);

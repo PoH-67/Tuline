@@ -58,13 +58,13 @@ export default function ResponsiveLayout({
               <div className="w-9 h-9 rounded-xl bg-white p-1 shadow-xs flex items-center justify-center">
                 <img
                   src="/assets/logo.png"
-                  alt="BENERIN"
+                  alt="TULINE"
                   className="w-full h-full object-contain"
                   onError={(e) => { e.target.style.display = 'none'; }}
                 />
               </div>
               <span className="text-xl font-extrabold font-jakarta text-[#0c1b33] tracking-tight">
-                BENER<span className="text-[#ff7f11]">IN</span>
+                TUL<span className="text-[#ff7f11]">INE</span>
               </span>
             </Link>
 
@@ -167,13 +167,13 @@ export default function ResponsiveLayout({
             <div className="w-8 h-8 rounded-xl bg-white p-1 shadow-xs flex items-center justify-center">
               <img
                 src="/assets/logo.png"
-                alt="BENERIN"
+                alt="TULINE"
                 className="w-full h-full object-contain"
                 onError={(e) => { e.target.style.display = 'none'; }}
               />
             </div>
             <span className="text-lg font-extrabold font-jakarta text-[#0c1b33] tracking-tight">
-              BENER<span className="text-[#ff7f11]">IN</span>
+              TUL<span className="text-[#ff7f11]">INE</span>
             </span>
           </div>
         </header>

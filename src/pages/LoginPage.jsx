@@ -55,17 +55,17 @@ export default function LoginPage() {
             <div className="w-20 h-20 rounded-2xl bg-white p-2 shadow-xs flex items-center justify-center">
               <img
                 src="/assets/logo.png"
-                alt="BENERIN Logo"
+                alt="TULINE Logo"
                 className="w-full h-full object-contain"
                 onError={(e) => { e.target.style.display = 'none'; }}
               />
             </div>
 
             <h1 className="text-[26px] font-extrabold font-jakarta text-center mt-3 tracking-tight">
-              Sign in BENER<span className="text-[#ff7f11]">IN</span>
+              Sign in TUL<span className="text-[#ff7f11]">INE</span>
             </h1>
             <p className="text-[13px] font-semibold text-black/75 text-center mt-0.5">
-              Barang rusak? BENERIN aja
+              Semua Urusan Tukang, Tinggal Online!
             </p>
           </div>
 

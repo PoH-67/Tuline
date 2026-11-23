@@ -140,7 +140,7 @@ export default function RegisterPage() {
                 {agreePromo && <Check className="w-3.5 h-3.5 stroke-[3]" />}
               </div>
               <span className="text-[11px] text-black/75 leading-tight">
-                Saya bersedia menerima pembaruan layanan, promo diskon, dan informasi teknisi BENERIN.
+                Saya bersedia menerima pembaruan layanan, promo diskon, dan informasi teknisi TULINE.
               </span>
             </label>
 

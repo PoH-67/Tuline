@@ -95,7 +95,7 @@ export default function AiConsultationPage() {
 
   return (
     <ResponsiveLayout
-      pageTitle="Konsultasi AI BENERIN"
+      pageTitle="Konsultasi AI TULINE"
       showBack
       onBack={() => navigate('/')}
       hideTopNav
@@ -111,7 +111,7 @@ export default function AiConsultationPage() {
             </div>
             <div>
               <h1 className="text-lg md:text-xl font-extrabold font-jakarta text-[#0c1b33]">
-                Asisten AI BENERIN
+                Asisten AI TULINE
               </h1>
               <p className="text-xs text-black/75">
                 Konsultasi instan & diagnosa awal sebelum teknisi datang ke rumah

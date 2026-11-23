@@ -57,14 +57,14 @@ export default function HomePage() {
            ========================================= */}
         <section className="bg-[#ffde59] rounded-3xl p-5 sm:p-6 shadow-sm border border-yellow-300 flex flex-col gap-4">
           
-          {/* Top Row: Saku BENERIN Card & Greeting */}
+          {/* Top Row: Saku TULINE Card & Greeting */}
           <div className="flex items-start justify-between gap-3">
             
-            {/* Saku BENERIN Card */}
+            {/* Saku TULINE Card */}
             <div className="bg-white rounded-2xl p-3.5 sm:p-4 shadow-sm w-[170px] sm:w-[210px] flex flex-col justify-between border border-black/5">
               <div>
                 <h3 className="text-xs sm:text-sm font-extrabold font-jakarta text-[#0c1b33]">
-                  Saku BENER<span className="text-[#ff7f11]">IN</span>
+                  Saku TUL<span className="text-[#ff7f11]">INE</span>
                 </h3>
                 <p className="text-xs sm:text-sm font-extrabold text-[#0c1b33] tracking-tight mt-1">
                   Rp {(currentUser?.walletBalance || 0).toLocaleString('id-ID')},00
@@ -171,7 +171,7 @@ export default function HomePage() {
           <div className="bg-white rounded-2xl p-3.5 shadow-2xs border border-black/5 flex items-center justify-between">
             <div>
               <h4 className="text-xs sm:text-sm font-extrabold text-[#ff7f11]">
-                Asisten AI BENERIN
+                Asisten AI TULINE
               </h4>
               <p className="text-[11px] sm:text-xs text-gray-700 font-medium mt-0.5">
                 Halo! Ceritakan keluhan Anda

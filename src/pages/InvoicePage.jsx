@@ -61,12 +61,12 @@ export default function InvoicePage() {
     setLoadingPay(true);
 
     try {
-      // Deduct the repair fee from Saku BENERIN
-      if (order?.paymentMethod === 'Saku BENERIN' && !paid) {
+      // Deduct the repair fee from Saku TULINE
+      if (order?.paymentMethod === 'Saku TULINE' && !paid) {
         const balance = Number(currentUser?.walletBalance) || 0;
         if (balance < repairFee) {
           setErrorMsg(
-            `Saldo Saku BENERIN Anda (Rp ${balance.toLocaleString('id-ID')}) tidak mencukupi untuk melunasi biaya perbaikan Rp ${repairFee.toLocaleString('id-ID')}. Silakan Top Up terlebih dahulu.`
+            `Saldo Saku TULINE Anda (Rp ${balance.toLocaleString('id-ID')}) tidak mencukupi untuk melunasi biaya perbaikan Rp ${repairFee.toLocaleString('id-ID')}. Silakan Top Up terlebih dahulu.`
           );
           setTopUpOpen(true);
           return;
@@ -127,7 +127,7 @@ export default function InvoicePage() {
               {paid ? (
                 <>
                   <CheckCircle className="w-4 h-4 text-emerald-600" />
-                  <span>Pembayaran Lunas • Terima Kasih telah menggunakan jasa BENERIN</span>
+                  <span>Pembayaran Lunas • Terima Kasih telah menggunakan jasa TULINE</span>
                 </>
               ) : (
                 <>
@@ -195,7 +195,7 @@ export default function InvoicePage() {
               <div className="pt-4 border-t-2 border-dashed border-gray-200 flex items-center justify-between">
                 <div>
                   <span className="text-sm font-extrabold text-black block">Total Pembayaran</span>
-                  <span className="text-[11px] text-gray-500">Metode: {order?.paymentMethod || 'Saku BENERIN'}</span>
+                  <span className="text-[11px] text-gray-500">Metode: {order?.paymentMethod || 'Saku TULINE'}</span>
                 </div>
                 <span className="text-2xl font-extrabold text-[#ff7f11] font-jakarta">
                   Rp {total.toLocaleString('id-ID')}
@@ -211,7 +211,7 @@ export default function InvoicePage() {
                     className="w-full h-12 bg-[#ff7f11] hover:bg-[#e06d0b] text-white font-extrabold text-sm rounded-full shadow-md active:scale-95 transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
                     <Wallet className="w-4 h-4" />
-                    <span>{loadingPay ? 'Memproses...' : 'Pelunasan dengan Saku BENERIN'}</span>
+                    <span>{loadingPay ? 'Memproses...' : 'Pelunasan dengan Saku TULINE'}</span>
                   </button>
                 ) : (
                   <div className="bg-emerald-100 text-emerald-800 p-3.5 rounded-2xl text-center text-xs font-extrabold flex items-center justify-center gap-2">

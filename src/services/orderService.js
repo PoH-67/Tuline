@@ -11,11 +11,11 @@ import {
   serverTimestamp,
 } from 'firebase/firestore';
 
-const LOCAL_STORAGE_ORDERS = 'benerin_orders_v2';
+const LOCAL_STORAGE_ORDERS = 'tuline_orders_v2';
 
 export const getStoredOrders = () => {
   try {
-    const raw = localStorage.getItem(LOCAL_STORAGE_ORDERS);
+    const raw = localStorage.getItem(LOCAL_STORAGE_ORDERS) || localStorage.getItem('benerin_orders_v2');
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
@@ -34,7 +34,7 @@ export const createOrder = async (orderPayload) => {
   const localId = 'ord_' + Date.now();
   const newOrder = {
     id: localId,
-    orderCode: 'BNR-' + Math.floor(100000 + Math.random() * 900000),
+    orderCode: 'TLN-' + Math.floor(100000 + Math.random() * 900000),
     userId: orderPayload.userId || 'guest',
     category: orderPayload.category || 'Perangkat Elektronik',
     subCategory: orderPayload.subCategory || 'Kulkas & Pendingin',
@@ -43,7 +43,7 @@ export const createOrder = async (orderPayload) => {
     visitDate: orderPayload.visitDate || '',
     visitTime: orderPayload.visitTime || '',
     notes: orderPayload.notes || '',
-    paymentMethod: orderPayload.paymentMethod || 'Saku BENERIN',
+    paymentMethod: orderPayload.paymentMethod || 'Saku TULINE',
     isPaid: false,
     workerId: orderPayload.workerId || 'w-1',
     workerName: orderPayload.workerName || 'Ilham Sersa',

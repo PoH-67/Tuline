@@ -35,7 +35,7 @@ export default function WorkerDetailPage() {
   const date = searchParams.get('date') || '';
   const time = searchParams.get('time') || '';
   const notes = searchParams.get('notes') || '';
-  const payment = searchParams.get('payment') || 'Saku BENERIN';
+  const payment = searchParams.get('payment') || 'Saku TULINE';
 
   const [bookingLoading, setBookingLoading] = useState(false);
   const [topUpOpen, setTopUpOpen] = useState(false);
@@ -55,12 +55,12 @@ export default function WorkerDetailPage() {
       return;
     }
 
-    // 2. If payment is Saku BENERIN, check & deduct
-    if (payment === 'Saku BENERIN') {
+    // 2. If payment is Saku TULINE, check & deduct
+    if (payment === 'Saku TULINE') {
       const balance = Number(currentUser.walletBalance) || 0;
       if (balance < worker.visitFee) {
         setErrorMsg(
-          `Saldo Saku BENERIN Anda (Rp ${balance.toLocaleString('id-ID')}) tidak mencukupi untuk biaya kunjungan Rp ${worker.visitFee.toLocaleString('id-ID')}. Silakan Top Up terlebih dahulu.`
+          `Saldo Saku TULINE Anda (Rp ${balance.toLocaleString('id-ID')}) tidak mencukupi untuk biaya kunjungan Rp ${worker.visitFee.toLocaleString('id-ID')}. Silakan Top Up terlebih dahulu.`
         );
         setTopUpOpen(true);
         return;
@@ -69,8 +69,8 @@ export default function WorkerDetailPage() {
 
     setBookingLoading(true);
     try {
-      // Deduct visit fee from Saku BENERIN
-      if (payment === 'Saku BENERIN') {
+      // Deduct visit fee from Saku TULINE
+      if (payment === 'Saku TULINE') {
         await deduct(worker.visitFee);
       }
 

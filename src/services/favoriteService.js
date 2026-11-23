@@ -1,8 +1,8 @@
-const FAVORITES_KEY = 'benerin_favorite_workers_v1';
+const FAVORITES_KEY = 'tuline_favorite_workers_v1';
 
 export const getFavoriteWorkers = () => {
   try {
-    const raw = localStorage.getItem(FAVORITES_KEY);
+    const raw = localStorage.getItem(FAVORITES_KEY) || localStorage.getItem('benerin_favorite_workers_v1');
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];

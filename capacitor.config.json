@@ -1,6 +1,6 @@
 {
-  "appId": "com.benerin.app",
-  "appName": "BENERIN",
+  "appId": "com.tuline.app",
+  "appName": "TULINE",
   "webDir": "dist",
   "bundledWebRuntime": false,
   "server": {
