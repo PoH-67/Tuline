@@ -261,79 +261,77 @@ export default function OrderCreatePage({ defaultAction }) {
 
   return (
     <ResponsiveLayout
-      pageTitle={currentActionConfig.title}
-      showBack
-      onBack={() => navigate('/')}
       hideTopNav
       hideBottomNav
+      noHeader
+      noPadding
     >
-      <div className="w-full flex-1 flex flex-col pb-8">
+      <div className="w-full min-h-screen bg-white flex flex-col pb-8">
         
         {/* =========================================
-            HEADER KUNING (Sesuai Desain Figma Gambar 1)
-            Back Arrow + Kategori Eksklusif per Halaman
+            HEADER KUNING (Sesuai Desain Figma Gambar 2)
+            Lebar full sampai ujung layar, hanya tombol panah merah/oranye di pojok kiri atas
            ========================================= */}
-        <section className="bg-[#ffde59] pt-3 pb-4 px-3 sm:px-4 rounded-b-3xl shadow-xs border-b border-yellow-300">
-          
-          {/* Top Row: Back Button & Header Title */}
-          <div className="flex items-center gap-3 mb-3">
-            <button
-              type="button"
-              onClick={() => navigate('/')}
-              className="p-1 rounded-full hover:bg-black/10 active:scale-95 transition cursor-pointer"
-            >
-              <img src={iconBackArrow} alt="Back" className="w-2.5 h-3.5 object-contain" />
-            </button>
-            <h1 className="text-sm sm:text-base font-extrabold text-[#0c1b33]">
-              {currentActionConfig.title}
-            </h1>
-          </div>
+        <section className="w-full bg-[#ffde59] pt-4 pb-6 px-4 border-b border-yellow-300">
+          <div className="w-full max-w-md mx-auto">
+            {/* Top Row: Tombol kembali panah tunggal tanpa teks */}
+            <div className="flex items-center mb-3">
+              <button
+                type="button"
+                onClick={() => navigate('/')}
+                className="p-1 -ml-1 text-[#ff7f11] hover:opacity-80 active:scale-95 transition cursor-pointer"
+                aria-label="Kembali"
+              >
+                <img src={iconBackArrow} alt="Kembali" className="w-3 h-4 object-contain" />
+              </button>
+            </div>
 
-          {/* Category Icons Row Eksklusif untuk Halaman ini */}
-          <div className="flex items-center justify-center gap-8 sm:gap-14">
-            {currentActionConfig.allowedCategories.map((cat) => {
-              const isSelected = activeCategory === cat.id;
-              return (
-                <button
-                  key={cat.id}
-                  type="button"
-                  onClick={() => {
-                    setActiveCategory(cat.id);
-                    setIsDropdownOpen(false);
-                  }}
-                  className="flex flex-col items-center text-center group cursor-pointer"
-                >
-                  <div
-                    className={`w-[60px] h-[60px] sm:w-[68px] sm:h-[68px] rounded-[14px] flex items-center justify-center p-2 transition ${
-                      isSelected
-                        ? 'bg-[#f0f0f0] border-2 border-[#e95322] shadow-xs'
-                        : 'bg-[#f0f0f0] border-2 border-transparent hover:border-gray-300'
-                    }`}
+            {/* Category Icons Row Eksklusif untuk Halaman ini */}
+            <div className="flex items-center justify-center gap-8 sm:gap-14">
+              {currentActionConfig.allowedCategories.map((cat) => {
+                const isSelected = activeCategory === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => {
+                      setActiveCategory(cat.id);
+                      setIsDropdownOpen(false);
+                    }}
+                    className="flex flex-col items-center text-center group cursor-pointer"
                   >
-                    <img
-                      src={cat.icon}
-                      alt={cat.name}
-                      className="w-full h-full object-contain"
-                    />
-                  </div>
-                  <span
-                    className={`text-[10px] sm:text-[11px] mt-1.5 leading-tight tracking-tight max-w-[80px] ${
-                      isSelected ? 'font-bold text-[#c40000]' : 'font-medium text-[#030303]'
-                    }`}
-                  >
-                    {cat.name}
-                  </span>
-                </button>
-              );
-            })}
+                    <div
+                      className={`w-[60px] h-[60px] sm:w-[68px] sm:h-[68px] rounded-[14px] flex items-center justify-center p-2 transition ${
+                        isSelected
+                          ? 'bg-[#f0f0f0] border-2 border-[#e95322] shadow-xs'
+                          : 'bg-[#f0f0f0] border-2 border-transparent hover:border-gray-300'
+                      }`}
+                    >
+                      <img
+                        src={cat.icon}
+                        alt={cat.name}
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <span
+                      className={`text-[10px] sm:text-[11px] mt-1.5 leading-tight tracking-tight max-w-[80px] ${
+                        isSelected ? 'font-bold text-[#c40000]' : 'font-medium text-[#030303]'
+                      }`}
+                    >
+                      {cat.name}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-
         </section>
 
         {/* =========================================
             FORM BODY (Sesuai Desain Figma Gambar 1)
            ========================================= */}
-        <form onSubmit={handleProceed} className="mt-4 px-2 sm:px-4 flex flex-col gap-4">
+        <div className="w-full flex-1 bg-white">
+          <form onSubmit={handleProceed} className="w-full max-w-md mx-auto px-4 py-4 flex flex-col gap-4">
           
           {/* Error Banner jika form belum lengkap */}
           {formError && (
@@ -564,6 +562,7 @@ export default function OrderCreatePage({ defaultAction }) {
           </button>
 
         </form>
+        </div>
 
       </div>
 
