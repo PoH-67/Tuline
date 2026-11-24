@@ -13,7 +13,7 @@ export default function NotificationsPage() {
       desc: 'Ilham Sersa sedang dalam perjalanan menuju rumah Anda. Estimasi tiba 25 menit.',
       time: '10 menit lalu',
       icon: CheckCircle2,
-      color: 'text-emerald-600 bg-emerald-50',
+      path: '/pesanan',
     },
     {
       id: 2,
@@ -21,7 +21,7 @@ export default function NotificationsPage() {
       desc: 'Saldo Saku TULINE Anda telah bertambah dan siap digunakan untuk pemesanan teknisi.',
       time: '30 menit lalu',
       icon: Tag,
-      color: 'text-orange-600 bg-orange-50',
+      path: '/profil',
     },
     {
       id: 3,
@@ -29,7 +29,7 @@ export default function NotificationsPage() {
       desc: 'Tanyakan estimasi biaya dan diagnosa awal gratis sebelum memesan teknisi ke rumah.',
       time: 'Kemarin',
       icon: Sparkles,
-      color: 'text-amber-600 bg-yellow-50',
+      path: '/konsultasi-ai',
     },
   ];
 
@@ -55,17 +55,26 @@ export default function NotificationsPage() {
             return (
               <div
                 key={n.id}
-                className="bg-white p-4 sm:p-5 rounded-3xl border border-gray-200 shadow-2xs hover:shadow-xs transition flex items-start gap-4"
+                onClick={() => n.path && navigate(n.path)}
+                className="bg-white p-4 sm:p-5 rounded-3xl border border-gray-200/90 shadow-2xs hover:shadow-xs hover:border-[#ff7f11]/30 transition flex items-start gap-3.5 sm:gap-4 cursor-pointer"
               >
-                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${n.color}`}>
-                  <Icon className="w-5 h-5" />
+                {/* Unified Brand Color #ff7f11 Icon Container */}
+                <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 bg-[#ff7f11]/10 text-[#ff7f11] border border-[#ff7f11]/20">
+                  <Icon className="w-5 h-5 stroke-[2.2]" />
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-bold text-black">{n.title}</h3>
-                    <span className="text-[11px] text-gray-400">{n.time}</span>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-3">
+                    <h3 className="text-sm font-bold text-[#0c1b33] leading-snug">
+                      {n.title}
+                    </h3>
+                    <span className="text-[11px] text-gray-400 shrink-0 whitespace-nowrap mt-0.5">
+                      {n.time}
+                    </span>
                   </div>
-                  <p className="text-xs text-gray-600 mt-1 leading-relaxed">{n.desc}</p>
+                  <p className="text-xs text-gray-600 mt-1 leading-relaxed">
+                    {n.desc}
+                  </p>
                 </div>
               </div>
             );
