@@ -1,35 +1,130 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import ResponsiveLayout from '../components/ResponsiveLayout';
 import TopUpModal from '../components/TopUpModal';
-import {
-  ArrowLeft,
-  Tv,
-  Zap,
-  Droplet,
-  Armchair,
-  Home as HomeIcon,
-  Camera,
-  Calendar,
-  Clock,
-  ChevronDown,
-  Wallet,
-  Plus,
-  Wrench,
-  AlertCircle,
-} from 'lucide-react';
+import { ChevronDown, AlertCircle, X } from 'lucide-react';
 
-export default function OrderCreatePage() {
+import iconElektronik from '../assets/figma_icons/cat_elektronik.svg';
+import iconListrik from '../assets/figma_icons/cat_listrik.svg';
+import iconLedeng from '../assets/figma_icons/cat_ledeng.svg';
+import iconFurnitur from '../assets/figma_icons/cat_furnitur.svg';
+import iconSipil from '../assets/figma_icons/cat_sipil.svg';
+
+import iconPhotoDoc from '../assets/figma_icons/icon_photo_doc.svg';
+import iconCalendarPin from '../assets/figma_icons/icon_calendar_pin.svg';
+import iconClock from '../assets/figma_icons/icon_clock.svg';
+import iconArrowCircle from '../assets/figma_icons/icon_arrow_circle.svg';
+import iconBackArrow from '../assets/figma_icons/icon_back_arrow.svg';
+
+// Definisi Kategori dan Sub-Kategori Eksklusif per Halaman
+// Reparasi -> Cuma Perangkat Elektronik & Furnitur
+// Instalasi -> Cuma Listrik Bangunan & Ledeng
+// Renovasi  -> Cuma Sipil & Bangunan
+export const ACTION_SERVICES = {
+  reparasi: {
+    actionKey: 'reparasi',
+    title: 'Reparasi',
+    defaultCat: 'elektronik',
+    placeholder: 'Contoh: freezer kulkas sudah tidak dingin, Kipas angin tidak berputar.',
+    allowedCategories: [
+      { id: 'elektronik', name: 'Perangkat Elektronik', icon: iconElektronik },
+      { id: 'furnitur', name: 'Furnitur', icon: iconFurnitur },
+    ],
+    categories: {
+      elektronik: [
+        'Kulkas & Pendingin',
+        'Air Conditioner (AC)',
+        'Mesin Cuci',
+        'TV & Audio',
+        'Kipas Angin',
+        'Microwave & Oven',
+      ],
+      furnitur: [
+        'Reparasi Engsel & Rel Laci',
+        'Meja & Kursi Patah / Goyang',
+        'Kunci Pintu & Grendel Rusak',
+        'Cat Ulang / Pernis Furnitur',
+        'Perbaikan Kitchen Set Kayu',
+      ],
+    },
+  },
+  instalasi: {
+    actionKey: 'instalasi',
+    title: 'Instalasi',
+    defaultCat: 'listrik',
+    placeholder: 'Contoh: pasang stopkontak di dapur, pasang pipa air baru.',
+    allowedCategories: [
+      { id: 'listrik', name: 'Listrik Bangunan', icon: iconListrik },
+      { id: 'ledeng', name: 'Ledeng', icon: iconLedeng },
+    ],
+    categories: {
+      listrik: [
+        'Pasang Titik Lampu & Stop Kontak',
+        'Pasang Box Panel MCB & Sekring',
+        'Instalasi Grounding & Penangkal Petir',
+        'Pasang Saklar Otomatis / Smart Home',
+        'Penarikan Jalur Kabel Baru',
+      ],
+      ledeng: [
+        'Instalasi Pipa Air Bersih / Kotor',
+        'Pasang Toren Air & Otomatis Pelampung',
+        'Pasang Kloset Duduk / Jongkok Baru',
+        'Pasang Wastafel, Bak Cuci & Shower',
+        'Pasang Kran & Filter Air',
+      ],
+    },
+  },
+  renovasi: {
+    actionKey: 'renovasi',
+    title: 'Renovasi',
+    defaultCat: 'sipil',
+    placeholder: 'Contoh: ganti keramik kamar mandi 2x2 meter, cat ulang dinding ruang tamu.',
+    allowedCategories: [
+      { id: 'sipil', name: 'Sipil & Bangunan', icon: iconSipil },
+    ],
+    categories: {
+      sipil: [
+        'Renovasi Kamar Mandi & Toilet',
+        'Pengecatan Ulang Dinding & Plafon',
+        'Renovasi Atap Dak Beton & Waterproofing',
+        'Bongkar & Pasang Lantai Granit / Keramik',
+        'Perombakan Plafon Gypsum & Drop Ceiling',
+        'Pasang Partisi Gypsum / Sekat Ruangan',
+      ],
+    },
+  },
+};
+
+export default function OrderCreatePage({ defaultAction }) {
   const navigate = useNavigate();
+  const params = useParams();
   const [searchParams] = useSearchParams();
   const { currentUser } = useAuth();
 
-  const initialCat = searchParams.get('cat') || 'elektronik';
+  // Tentukan Action Type: dari prop defaultAction, atau route param :actionType, atau query ?action=
+  const actionFromRoute = params.actionType;
+  const actionFromQuery = searchParams.get('action');
+  const actionKey = (defaultAction || actionFromRoute || actionFromQuery || 'reparasi').toLowerCase();
 
-  const [activeTab, setActiveTab] = useState(initialCat);
-  const [selectedSubCategory, setSelectedSubCategory] = useState('Kulkas & Pendingin');
-  const [problemDetail, setProblemDetail] = useState('');
+  const currentActionConfig = ACTION_SERVICES[actionKey] || ACTION_SERVICES.reparasi;
+
+  // Pastikan kategori awal adalah salah satu dari allowedCategories halaman ini
+  const queryCat = searchParams.get('cat');
+  const isQueryCatAllowed = currentActionConfig.allowedCategories.some((c) => c.id === queryCat);
+  const initialCat = isQueryCatAllowed ? queryCat : currentActionConfig.defaultCat;
+
+  const [activeCategory, setActiveCategory] = useState(initialCat);
+
+  // Subkategori terpilih di dropdown
+  const availableSubCategories = currentActionConfig.categories[activeCategory] || [];
+  const [selectedSubCategory, setSelectedSubCategory] = useState(
+    searchParams.get('sub') || availableSubCategories[0] || ''
+  );
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  // Detail Masalah
+  const [problemDetail, setProblemDetail] = useState(searchParams.get('problem') || '');
   
   // Alamat harus KOSONG awalnya (wajib diisi oleh pengguna)
   const [address, setAddress] = useState('');
@@ -45,8 +140,22 @@ export default function OrderCreatePage() {
   // Foto unit WAJIB
   const [photoPreview, setPhotoPreview] = useState(null);
   const [topUpOpen, setTopUpOpen] = useState(false);
-  const [isSearching, setIsSearching] = useState(false);
   const [formError, setFormError] = useState('');
+
+  // Saat actionKey atau kategori berubah, reset subkategori ke item pertama kategori terkait
+  useEffect(() => {
+    // Validasi apakah activeCategory masih valid di halaman ini
+    const isCatValid = currentActionConfig.allowedCategories.some((c) => c.id === activeCategory);
+    if (!isCatValid) {
+      setActiveCategory(currentActionConfig.defaultCat);
+      return;
+    }
+
+    const subs = currentActionConfig.categories[activeCategory] || [];
+    if (subs.length > 0 && !subs.includes(selectedSubCategory)) {
+      setSelectedSubCategory(subs[0]);
+    }
+  }, [actionKey, activeCategory, currentActionConfig]);
 
   // Hitung Waktu Sekarang di zona WIB (UTC+7)
   const getWIBNow = () => {
@@ -80,29 +189,6 @@ export default function OrderCreatePage() {
     ? ALL_TIME_SLOTS.filter((slot) => slot.endHour > currentWIBHour)
     : ALL_TIME_SLOTS;
 
-  useEffect(() => {
-    const queryProblem = searchParams.get('problem');
-    const querySub = searchParams.get('sub');
-    if (queryProblem) setProblemDetail(queryProblem);
-    if (querySub) setSelectedSubCategory(querySub);
-  }, [searchParams]);
-
-  const categories = [
-    { id: 'elektronik', name: 'Perangkat Elektronik', icon: Tv },
-    { id: 'listrik', name: 'Listrik Bangunan', icon: Zap },
-    { id: 'ledeng', name: 'Ledeng', icon: Droplet },
-    { id: 'furnitur', name: 'Furnitur', icon: Armchair },
-    { id: 'sipil', name: 'Sipil & Bangunan', icon: HomeIcon },
-  ];
-
-  const subCategories = {
-    elektronik: ['Kulkas & Pendingin', 'Air Conditioner (AC)', 'Mesin Cuci', 'TV & Audio', 'Kipas Angin', 'Microwave & Oven'],
-    listrik: ['Instalasi Stop Kontak', 'MCB / Sekring Sering Turun', 'Jalur Kabel Korslet', 'Pemasangan Titik Lampu', 'Penyeimbangan Daya'],
-    ledeng: ['Pipa Bocor / Rembes', 'Wastafel / Kloset Mampet', 'Pompa Air & Toren', 'Ganti Kran & Pipa', 'Water Heater'],
-    furnitur: ['Reparasi Engsel & Lemari', 'Kitchen Set Kayu', 'Meja & Kursi Patah', 'Cat Ulang & Pernis', 'Bongkar Pasang Mebel'],
-    sipil: ['Atap / Genteng Bocor', 'Plamir & Cat Dinding Retak', 'Pasang Keramik Lantai', 'Plafon Rusak / Jebol', 'Partisi Ruangan'],
-  };
-
   const handlePhotoUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -124,7 +210,7 @@ export default function OrderCreatePage() {
 
     // 1. Validasi Detail Masalah (Wajib)
     if (!problemDetail.trim()) {
-      setFormError('Mohon isi detail masalah kerusakan unit terlebih dahulu.');
+      setFormError('Mohon isi detail masalah terlebih dahulu.');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
@@ -152,13 +238,15 @@ export default function OrderCreatePage() {
 
     // 5. Validasi Jam Kunjungan (Wajib)
     if (!visitTime) {
-      setFormError('Silakan pilih jam kunjungan teknisi.');
+      setFormError('Silakan pilih jam kunjungan.');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
+    // Menuju Halaman Pencarian / Matching Teknisi dengan parameter lengkap
     const params = new URLSearchParams({
-      cat: activeTab,
+      action: actionKey,
+      cat: activeCategory,
       sub: selectedSubCategory,
       problem: problemDetail,
       address,
@@ -168,62 +256,69 @@ export default function OrderCreatePage() {
       payment: paymentMethod,
     });
 
-    setIsSearching(true);
-    setTimeout(() => {
-      navigate(`/teknisi?${params.toString()}`);
-    }, 2500);
+    navigate(`/teknisi?${params.toString()}`);
   };
 
   return (
     <ResponsiveLayout
-      pageTitle="Pesan Jasa Servis"
+      pageTitle={currentActionConfig.title}
       showBack
       onBack={() => navigate('/')}
       hideTopNav
       hideBottomNav
     >
-      <div className="w-full flex-1 flex flex-col gap-6">
+      <div className="w-full flex-1 flex flex-col pb-8">
         
-        {/* Category Header Pills (Desktop & Mobile) */}
-        <div className="bg-[#ffde59] rounded-3xl p-5 shadow-sm border border-yellow-300">
-          <div className="flex items-center justify-between mb-3">
-            <h1 className="text-lg md:text-xl font-extrabold font-jakarta text-[#0c1b33]">
-              Pilih Kategori Layanan
+        {/* =========================================
+            HEADER KUNING (Sesuai Desain Figma Gambar 1)
+            Back Arrow + Kategori Eksklusif per Halaman
+           ========================================= */}
+        <section className="bg-[#ffde59] pt-3 pb-4 px-3 sm:px-4 rounded-b-3xl shadow-xs border-b border-yellow-300">
+          
+          {/* Top Row: Back Button & Header Title */}
+          <div className="flex items-center gap-3 mb-3">
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="p-1 rounded-full hover:bg-black/10 active:scale-95 transition cursor-pointer"
+            >
+              <img src={iconBackArrow} alt="Back" className="w-2.5 h-3.5 object-contain" />
+            </button>
+            <h1 className="text-sm sm:text-base font-extrabold text-[#0c1b33]">
+              {currentActionConfig.title}
             </h1>
-            <span className="text-xs font-bold text-black/70">
-              Teknisi Bersertifikat Siap Dipanggil
-            </span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5">
-            {categories.map((cat) => {
-              const Icon = cat.icon;
-              const isSelected = activeTab === cat.id;
-
+          {/* Category Icons Row Eksklusif untuk Halaman ini */}
+          <div className="flex items-center justify-center gap-8 sm:gap-14">
+            {currentActionConfig.allowedCategories.map((cat) => {
+              const isSelected = activeCategory === cat.id;
               return (
                 <button
                   key={cat.id}
                   type="button"
                   onClick={() => {
-                    setActiveTab(cat.id);
-                    setSelectedSubCategory(subCategories[cat.id][0]);
+                    setActiveCategory(cat.id);
+                    setIsDropdownOpen(false);
                   }}
-                  className={`flex items-center sm:flex-col justify-start sm:justify-center p-3 rounded-2xl transition-all cursor-pointer ${
-                    isSelected
-                      ? 'bg-white border-2 border-[#e95322] shadow-sm scale-102'
-                      : 'bg-white/70 hover:bg-white border border-transparent'
-                  }`}
+                  className="flex flex-col items-center text-center group cursor-pointer"
                 >
                   <div
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center mr-2.5 sm:mr-0 ${
-                      isSelected ? 'bg-orange-100 text-[#e95322]' : 'text-gray-600'
+                    className={`w-[60px] h-[60px] sm:w-[68px] sm:h-[68px] rounded-[14px] flex items-center justify-center p-2 transition ${
+                      isSelected
+                        ? 'bg-[#f0f0f0] border-2 border-[#e95322] shadow-xs'
+                        : 'bg-[#f0f0f0] border-2 border-transparent hover:border-gray-300'
                     }`}
                   >
-                    <Icon className="w-5 h-5" />
+                    <img
+                      src={cat.icon}
+                      alt={cat.name}
+                      className="w-full h-full object-contain"
+                    />
                   </div>
                   <span
-                    className={`text-xs mt-0 sm:mt-1.5 text-left sm:text-center leading-tight ${
-                      isSelected ? 'font-bold text-[#e95322]' : 'font-medium text-gray-700'
+                    className={`text-[10px] sm:text-[11px] mt-1.5 leading-tight tracking-tight max-w-[80px] ${
+                      isSelected ? 'font-bold text-[#c40000]' : 'font-medium text-[#030303]'
                     }`}
                   >
                     {cat.name}
@@ -232,267 +327,248 @@ export default function OrderCreatePage() {
               );
             })}
           </div>
-        </div>
 
-        {/* Validation Error Banner */}
-        {formError && (
-          <div className="bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded-2xl text-xs sm:text-sm font-semibold flex items-center gap-2.5 shadow-2xs animate-in fade-in">
-            <AlertCircle className="w-5 h-5 text-red-600 shrink-0" />
-            <span>{formError}</span>
-          </div>
-        )}
+        </section>
 
-        {/* Booking Form (2 Columns on Desktop) */}
-        <form
-          onSubmit={handleProceed}
-          className="bg-white rounded-3xl p-6 sm:p-8 shadow-xs border border-gray-200 flex flex-col gap-5 text-[#0c1b33]"
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            
-            {/* Left Column: Problem & Category */}
-            <div className="flex flex-col gap-4">
-              
-              {/* Sub-Category Selection */}
-              <div>
-                <label className="text-xs font-bold text-black block mb-1.5">
-                  Sub-Kategori Masalah <span className="text-[#e95322]">*</span>
-                </label>
-                <div className="relative">
-                  <select
-                    value={selectedSubCategory}
-                    onChange={(e) => setSelectedSubCategory(e.target.value)}
-                    className="w-full h-11 px-4 bg-[#f8f9fe] border-2 border-black/10 rounded-2xl text-xs sm:text-sm font-semibold text-black focus:outline-none focus:border-[#e95322] appearance-none"
+        {/* =========================================
+            FORM BODY (Sesuai Desain Figma Gambar 1)
+           ========================================= */}
+        <form onSubmit={handleProceed} className="mt-4 px-2 sm:px-4 flex flex-col gap-4">
+          
+          {/* Error Banner jika form belum lengkap */}
+          {formError && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-xs text-red-600 font-bold">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{formError}</span>
+            </div>
+          )}
+
+          {/* 1. KATEGORI (DROPDOWN) */}
+          <div className="relative">
+            <label className="block text-[11px] font-bold text-black mb-1">
+              Kategori <span className="text-red-500">*</span>
+            </label>
+            <button
+              type="button"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="w-full h-[40px] bg-white border-2 border-black/80 rounded-[15px] px-4 flex items-center justify-between text-left text-[11px] text-black font-medium focus:outline-none focus:ring-1 focus:ring-[#ff7f11] cursor-pointer"
+            >
+              <span>{selectedSubCategory || 'pilih'}</span>
+              <ChevronDown className={`w-4 h-4 text-black transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {/* Dropdown Options */}
+            {isDropdownOpen && (
+              <div className="absolute top-[62px] left-0 right-0 bg-white border-2 border-black/80 rounded-[15px] shadow-lg z-30 max-h-56 overflow-y-auto overflow-hidden divide-y divide-gray-100">
+                {availableSubCategories.map((sub) => (
+                  <button
+                    key={sub}
+                    type="button"
+                    onClick={() => {
+                      setSelectedSubCategory(sub);
+                      setIsDropdownOpen(false);
+                      setFormError('');
+                    }}
+                    className={`w-full px-4 py-2.5 text-left text-[11px] font-bold hover:bg-orange-50 transition cursor-pointer ${
+                      selectedSubCategory === sub ? 'text-[#ff7f11] bg-orange-50/60' : 'text-black'
+                    }`}
                   >
-                    {subCategories[activeTab]?.map((sub) => (
-                      <option key={sub} value={sub}>
-                        {sub}
+                    {sub}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* 2. FOTO (Kiri) & DETAIL MASALAH (Kanan) Side by Side */}
+          <div className="flex items-start gap-3">
+            
+            {/* Foto (Wajib) */}
+            <div className="w-[71px] shrink-0">
+              <label className="block text-[11px] font-bold text-black mb-1">
+                Foto <span className="text-red-500">*</span>
+              </label>
+              
+              <div className="relative">
+                <input
+                  type="file"
+                  id="photo-upload-input"
+                  accept="image/*"
+                  onChange={handlePhotoUpload}
+                  className="hidden"
+                />
+
+                {photoPreview ? (
+                  <div className="w-[71px] h-[71px] rounded-[10px] overflow-hidden border border-gray-300 relative group">
+                    <img
+                      src={photoPreview}
+                      alt="Preview"
+                      className="w-full h-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setPhotoPreview(null)}
+                      className="absolute top-1 right-1 w-4 h-4 bg-red-600 text-white rounded-full flex items-center justify-center text-[10px] opacity-80 group-hover:opacity-100"
+                    >
+                      <X className="w-2.5 h-2.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <label
+                    htmlFor="photo-upload-input"
+                    className="w-[71px] h-[71px] bg-[#f0f0f0] rounded-[10px] flex flex-col items-center justify-center cursor-pointer hover:bg-gray-200 transition"
+                  >
+                    <img src={iconPhotoDoc} alt="Upload Foto" className="w-6 h-7 object-contain opacity-80" />
+                  </label>
+                )}
+              </div>
+            </div>
+
+            {/* Detail Masalah (Wajib) */}
+            <div className="flex-1">
+              <label className="block text-[11px] font-bold text-black mb-1">
+                Detail Masalah <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                rows={3}
+                value={problemDetail}
+                onChange={(e) => {
+                  setProblemDetail(e.target.value);
+                  setFormError('');
+                }}
+                placeholder={currentActionConfig.placeholder}
+                className="w-full h-[71px] bg-[#f0f0f0] rounded-[10px] p-2.5 text-[11px] text-black placeholder-gray-400 resize-none focus:outline-none focus:ring-1 focus:ring-[#ff7f11]"
+              />
+            </div>
+
+          </div>
+
+          {/* 3. ALAMAT LENGKAP (Wajib) */}
+          <div>
+            <label className="block text-[11px] font-bold text-black mb-1">
+              Alamat <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={address}
+              onChange={(e) => {
+                setAddress(e.target.value);
+                setFormError('');
+              }}
+              placeholder="Contoh: Jalan Haji Hasanudin, Rt 01 Rw 02 No 7, Pondok Petir, depok."
+              className="w-full h-[39px] bg-[#f0f0f0] rounded-[10px] px-3 text-[11px] text-black placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-[#ff7f11]"
+            />
+          </div>
+
+          {/* 4. JADWAL KUNJUNGAN (Wajib) */}
+          <div>
+            <label className="block text-[11px] font-bold text-black mb-1">
+              Jadwal Kunjungan <span className="text-red-500">*</span>
+            </label>
+            
+            <div className="grid grid-cols-2 gap-3">
+              
+              {/* Tanggal */}
+              <div className="bg-[#f0f0f0] rounded-[10px] h-[45px] px-2.5 py-1 flex flex-col justify-center relative">
+                <span className="text-[10px] text-[#3a3a3a] leading-none mb-0.5">Tanggal</span>
+                <div className="flex items-center gap-1.5">
+                  <img src={iconCalendarPin} alt="Calendar" className="w-3.5 h-3.5 object-contain shrink-0" />
+                  <input
+                    type="date"
+                    min={todayWIBStr}
+                    value={visitDate}
+                    onChange={(e) => {
+                      setVisitDate(e.target.value);
+                      setVisitTime('');
+                      setFormError('');
+                    }}
+                    className="w-full bg-transparent text-[10px] font-medium text-black focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Jam */}
+              <div className="bg-[#f0f0f0] rounded-[10px] h-[45px] px-2.5 py-1 flex flex-col justify-center relative">
+                <span className="text-[10px] text-[#3a3a3a] leading-none mb-0.5">Jam</span>
+                <div className="flex items-center gap-1.5">
+                  <img src={iconClock} alt="Clock" className="w-3.5 h-3.5 object-contain shrink-0" />
+                  <select
+                    value={visitTime}
+                    onChange={(e) => {
+                      setVisitTime(e.target.value);
+                      setFormError('');
+                    }}
+                    disabled={!visitDate}
+                    className="w-full bg-transparent text-[10px] font-medium text-black focus:outline-none cursor-pointer"
+                  >
+                    <option value="">{visitDate ? 'Pilih Jam' : 'Pilih Tanggal Dulu'}</option>
+                    {availableTimeSlots.map((slot) => (
+                      <option key={slot.label} value={slot.label}>
+                        {slot.label}
                       </option>
                     ))}
                   </select>
-                  <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
                 </div>
               </div>
 
-              {/* Detail Masalah & Foto Upload */}
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-bold text-black">
-                    Detail Masalah Kerusakan <span className="text-[#e95322]">*</span>
-                  </label>
-                  <label className="text-xs font-bold text-black">
-                    Foto Unit <span className="text-[#e95322]">* Wajib</span>
-                  </label>
-                </div>
-                <div className="flex gap-3">
-                  <div className="flex-1">
-                    <textarea
-                      value={problemDetail}
-                      onChange={(e) => {
-                        setProblemDetail(e.target.value);
-                        if (formError) setFormError('');
-                      }}
-                      placeholder="Contoh: freezer kulkas tidak dingin, kipas angin tidak berputar, ada bunyi mendengung..."
-                      rows={3}
-                      className="w-full p-3 bg-[#f7f5fb] rounded-2xl text-xs sm:text-sm text-black placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-[#e95322] resize-none border border-gray-200"
-                    />
-                  </div>
-
-                  {/* Photo Upload Box (Wajib) */}
-                  <label className={`w-24 h-[86px] rounded-2xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition shrink-0 relative overflow-hidden ${
-                    photoPreview ? 'border-emerald-400 bg-emerald-50/30' : 'border-[#e95322]/40 bg-[#fff5ee] hover:bg-orange-50'
-                  }`}>
-                    {photoPreview ? (
-                      <img src={photoPreview} alt="Preview" className="w-full h-full object-cover rounded-2xl" />
-                    ) : (
-                      <>
-                        <Camera className="w-5 h-5 text-[#e95322]" />
-                        <span className="text-[10px] text-[#e95322] mt-1 font-bold">Wajib Foto</span>
-                      </>
-                    )}
-                    <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
-                  </label>
-                </div>
-              </div>
-
-              {/* Catatan Tambahan (Opsional) */}
-              <div>
-                <label className="text-xs font-bold text-black block mb-1.5">
-                  Catatan Tambahan <span className="text-gray-400 font-normal">(Opsional)</span>
-                </label>
-                <input
-                  type="text"
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Contoh: Rumah pagar hitam samping musholla, tolong bawa obeng khusus"
-                  className="w-full h-11 px-4 bg-[#f7f5fb] rounded-2xl text-xs sm:text-sm text-black placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-[#e95322] border border-gray-200"
-                />
-              </div>
             </div>
-
-            {/* Right Column: Address, Date & Payment */}
-            <div className="flex flex-col gap-4">
-              {/* Alamat Kunjungan (Default Kosong, Wajib Diisi) */}
-              <div>
-                <label className="text-xs font-bold text-black block mb-1.5">
-                  Alamat Lengkap Kunjungan <span className="text-[#e95322]">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={address}
-                  onChange={(e) => {
-                    setAddress(e.target.value);
-                    if (formError) setFormError('');
-                  }}
-                  placeholder="Masukkan alamat lengkap rumah/lokasi perbaikan Anda..."
-                  className="w-full h-11 px-4 bg-[#f7f5fb] rounded-2xl text-xs sm:text-sm text-black placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-[#e95322] border border-gray-200"
-                />
-              </div>
-
-              {/* Jadwal Kunjungan: Tanggal & Jam (Timeline WIB +7, Wajib Diisi) */}
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-bold text-black">
-                    Jadwal Kunjungan Teknisi (WIB +7) <span className="text-[#e95322]">*</span>
-                  </label>
-                  <span className="text-[10px] text-gray-500 font-medium">Zona Waktu: WIB</span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {/* Tanggal Picker: Minimal hari ini (tidak bisa pilih yang sudah lewat) */}
-                  <div className="bg-[#f7f5fb] border border-gray-200 rounded-2xl p-2.5 flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-[#e95322] shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <span className="text-[9px] text-gray-500 block leading-tight font-bold">
-                        Pilih Tanggal <span className="text-[#e95322]">*</span>
-                      </span>
-                      <input
-                        type="date"
-                        min={todayWIBStr}
-                        value={visitDate}
-                        onChange={(e) => {
-                          setVisitDate(e.target.value);
-                          setVisitTime('');
-                          if (formError) setFormError('');
-                        }}
-                        className="w-full bg-transparent text-xs font-bold text-black focus:outline-none cursor-pointer"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Jam Picker: Otomatis menyaring jam yang sudah lewat jika tanggalnya hari ini */}
-                  <div className="bg-[#f7f5fb] border border-gray-200 rounded-2xl p-2.5 flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-[#e95322] shrink-0" />
-                    <div className="flex-1 min-w-0 relative">
-                      <span className="text-[9px] text-gray-500 block leading-tight font-bold">
-                        Pilih Jam <span className="text-[#e95322]">*</span>
-                      </span>
-                      <select
-                        value={visitTime}
-                        onChange={(e) => {
-                          setVisitTime(e.target.value);
-                          if (formError) setFormError('');
-                        }}
-                        disabled={!visitDate}
-                        className="w-full bg-transparent text-xs font-bold text-black focus:outline-none appearance-none cursor-pointer disabled:opacity-50"
-                      >
-                        <option value="">{visitDate ? '-- Pilih Jam --' : 'Pilih Tanggal Dulu'}</option>
-                        {availableTimeSlots.map((slot) => (
-                          <option key={slot.label} value={slot.label}>
-                            {slot.label}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown className="absolute right-0 top-3 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Notice jika hari ini semua slot sudah lewat */}
-                {isSelectedToday && availableTimeSlots.length === 0 && (
-                  <p className="text-[11px] text-red-600 mt-2 font-medium">
-                    ⚠️ Semua jam kunjungan untuk hari ini telah lewat. Silakan pilih tanggal besok atau berikutnya.
-                  </p>
-                )}
-              </div>
-
-              {/* Metode Pembayaran */}
-              <div>
-                <label className="text-xs font-bold text-black block mb-1.5">
-                  Metode Pembayaran
-                </label>
-                <div className="bg-[#fff9e6] border border-amber-200 rounded-2xl p-3.5 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-[#ffde59] flex items-center justify-center text-[#ff7f11]">
-                      <Wallet className="w-5 h-5 fill-current" />
-                    </div>
-                    <div>
-                      <span className="text-xs font-extrabold text-black block leading-tight">
-                        Saku TUL<span className="text-[#ff7f11]">INE</span>
-                      </span>
-                      <span className="text-[11px] text-gray-600">
-                        Saldo: Rp {(currentUser?.walletBalance || 0).toLocaleString('id-ID')}
-                      </span>
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setTopUpOpen(true)}
-                    className="flex items-center gap-1 text-xs font-bold text-[#ff7f11] bg-white px-2.5 py-1 rounded-lg border border-amber-200 hover:bg-orange-50 transition cursor-pointer"
-                  >
-                    <Plus className="w-3.5 h-3.5 stroke-[3]" />
-                    <span>Top Up</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-
           </div>
 
-          {/* Submit Button */}
-          <div className="pt-2 border-t border-gray-100 flex justify-end">
-            <button
-              type="submit"
-              className="w-full md:w-auto md:min-w-[280px] h-12 bg-[#ffde59] hover:bg-yellow-400 text-black font-extrabold text-sm rounded-full shadow-md active:scale-98 transition flex items-center justify-center gap-2 cursor-pointer border border-black/5"
-            >
-              <span>Cari Teknisi Siap Berangkat</span>
-              <span className="text-sm">→</span>
-            </button>
+          {/* 5. CATATAN TAMBAHAN (Opsional) */}
+          <div>
+            <label className="block text-[11px] font-bold text-black mb-1">
+              Catatan Tambahan
+            </label>
+            <input
+              type="text"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Tambahan yang membantu. Contoh: patokan rumah (cat,pagar), Kipas bunyi namun tidak berputar, baut hilang."
+              className="w-full h-[54px] bg-[#f0f0f0] rounded-[5px] px-3 text-[11px] text-black placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-[#ff7f11]"
+            />
           </div>
+
+          {/* 6. METODE PEMBAYARAN */}
+          <div>
+            <label className="block text-[11px] font-bold text-black mb-1">
+              Metode Pembayaran
+            </label>
+            <div className="w-full h-[54px] bg-[#f0f0f0] rounded-[5px] px-4 flex items-center justify-between">
+              <div>
+                <span className="text-sm font-extrabold font-jakarta text-black">
+                  Saku TU<span className="text-[#ff7f11]">LINE</span>
+                </span>
+              </div>
+              <div className="text-right text-[11px] text-black/70 leading-tight">
+                <p>Tersedia di saku:</p>
+                <p className="font-bold text-black">
+                  Rp {(currentUser?.walletBalance || 0).toLocaleString('id-ID')}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* 7. TOMBOL "CARI TEKNISI" */}
+          <button
+            type="submit"
+            className="w-full h-[49px] bg-[#ffde59] hover:bg-[#ebce4b] rounded-[5px] flex items-center justify-center relative shadow-sm cursor-pointer active:scale-[0.99] transition mt-2 border border-yellow-400"
+          >
+            <span className="font-serif text-lg font-bold text-black tracking-wide">
+              Cari Teknisi
+            </span>
+            <img
+              src={iconArrowCircle}
+              alt="Arrow"
+              className="w-5 h-5 absolute right-4 object-contain"
+            />
+          </button>
+
         </form>
 
       </div>
 
+      {/* Top Up Modal jika dibutuhkan */}
       <TopUpModal isOpen={topUpOpen} onClose={() => setTopUpOpen(false)} />
-    
-      {/* Loading Overlay "Mencari teknisi..." */}
-      {isSearching && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl border border-yellow-200 flex flex-col items-center text-center animate-in fade-in zoom-in-95 duration-200">
-            {/* Animated Radar Pulse */}
-            <div className="relative w-28 h-28 flex items-center justify-center mb-5">
-              <span className="absolute inset-0 rounded-full bg-amber-400/30 animate-ping" />
-              <span className="absolute inset-2 rounded-full bg-[#ffde59]/50 animate-pulse" />
-              <div className="relative z-10 w-20 h-20 rounded-full bg-[#ffde59] shadow-md flex items-center justify-center text-[#ff7f11]">
-                <Wrench className="w-9 h-9 animate-bounce" />
-              </div>
-            </div>
-
-            <h3 className="text-xl font-extrabold font-jakarta text-[#0c1b33] mb-1.5">
-              Mencari teknisi...
-            </h3>
-            <p className="text-xs text-gray-500 font-medium leading-relaxed max-w-[260px]">
-              Menghubungkan ke teknisi siap berangkat terdekat di area lokasi Anda...
-            </p>
-
-            <div className="flex items-center gap-2 mt-5">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#ff7f11] animate-bounce [animation-delay:-0.3s]"></span>
-              <span className="w-2.5 h-2.5 rounded-full bg-[#ff7f11] animate-bounce [animation-delay:-0.15s]"></span>
-              <span className="w-2.5 h-2.5 rounded-full bg-[#ff7f11] animate-bounce"></span>
-            </div>
-          </div>
-        </div>
-      )}
     </ResponsiveLayout>
   );
 }

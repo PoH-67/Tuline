@@ -8,6 +8,7 @@ export default function WorkerSearchPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
+  const action = searchParams.get('action') || '';
   const category = searchParams.get('cat') || '';
   const subCategory = searchParams.get('sub') || '';
   const problem = searchParams.get('problem') || '';
@@ -26,9 +27,26 @@ export default function WorkerSearchPage() {
   let displayedWorkers = [...WORKERS];
 
   if (subCategory) {
-    displayedWorkers = displayedWorkers.filter(
-      (w) => w.subCategories && w.subCategories.includes(subCategory)
+    const subMatches = displayedWorkers.filter(
+      (w) =>
+        w.subCategories &&
+        w.subCategories.some(
+          (s) =>
+            s.toLowerCase().includes(subCategory.toLowerCase()) ||
+            subCategory.toLowerCase().includes(s.toLowerCase())
+        )
     );
+    if (subMatches.length > 0) {
+      displayedWorkers = subMatches;
+    } else if (category && category !== 'semua') {
+      const catLower = category.toLowerCase();
+      displayedWorkers = displayedWorkers.filter(
+        (w) =>
+          w.categoryKey.toLowerCase() === catLower ||
+          (w.categories && w.categories.includes(catLower)) ||
+          w.category.toLowerCase().includes(catLower)
+      );
+    }
   } else if (category && category !== 'semua') {
     const catLower = category.toLowerCase();
     displayedWorkers = displayedWorkers.filter(
@@ -70,6 +88,7 @@ export default function WorkerSearchPage() {
 
   const handleSelectWorker = (workerId) => {
     const params = new URLSearchParams({
+      action,
       cat: category,
       sub: subCategory,
       problem,

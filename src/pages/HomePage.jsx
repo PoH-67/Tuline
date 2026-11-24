@@ -4,18 +4,13 @@ import { useAuth } from '../contexts/AuthContext';
 import ResponsiveLayout from '../components/ResponsiveLayout';
 import TopUpModal from '../components/TopUpModal';
 import { getStoredOrders } from '../services/orderService';
-import {
-  Search,
-  Plus,
-  Wrench,
-  Zap,
-  Home as HomeIcon,
-  MessageCircle,
-  Receipt,
-  ChevronRight,
-  Droplet,
-  Armchair,
-} from 'lucide-react';
+import { Search, Plus, ChevronRight } from 'lucide-react';
+
+import iconReparasi from '../assets/figma_icons/beranda_reparasi.svg';
+import iconInstalasi from '../assets/figma_icons/beranda_instalasi.svg';
+import iconRenovasi from '../assets/figma_icons/beranda_renovasi.svg';
+import iconAi from '../assets/figma_icons/beranda_ai.svg';
+import iconNota from '../assets/figma_icons/beranda_nota.svg';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -26,8 +21,8 @@ export default function HomePage() {
   const orders = getStoredOrders();
   const latestOrder = orders.length > 0 ? orders[0] : null;
 
-  const handleCategoryClick = (catKey) => {
-    navigate(`/order/new?cat=${catKey}`);
+  const handleActionClick = (actionKey) => {
+    navigate(`/order/${actionKey}`);
   };
 
   const handleSearchSubmit = (e) => {
@@ -35,16 +30,29 @@ export default function HomePage() {
     if (searchQuery.trim()) {
       navigate(`/teknisi?q=${encodeURIComponent(searchQuery)}`);
     } else {
-      navigate('/order/new');
+      navigate('/order/reparasi');
     }
   };
 
-  const categories = [
-    { id: 'elektronik', name: 'Reparasi', subtitle: 'Elektronik & AC', icon: Wrench, color: 'text-[#ff7f11] bg-orange-50' },
-    { id: 'listrik', name: 'Instalasi', subtitle: 'Listrik & Saklar', icon: Zap, color: 'text-amber-600 bg-amber-50' },
-    { id: 'sipil', name: 'Renovasi', subtitle: 'Sipil & Bangunan', icon: HomeIcon, color: 'text-indigo-600 bg-indigo-50' },
-    { id: 'ledeng', name: 'Ledeng', subtitle: 'Pipa & Saluran Air', icon: Droplet, color: 'text-blue-600 bg-blue-50' },
-    { id: 'furnitur', name: 'Furnitur', subtitle: 'Mebel & Kayu', icon: Armchair, color: 'text-emerald-600 bg-emerald-50' },
+  const mainActions = [
+    {
+      id: 'reparasi',
+      name: 'Reparasi',
+      icon: iconReparasi,
+      path: '/order/reparasi',
+    },
+    {
+      id: 'instalasi',
+      name: 'Instalasi',
+      icon: iconInstalasi,
+      path: '/order/instalasi',
+    },
+    {
+      id: 'renovasi',
+      name: 'Renovasi',
+      icon: iconRenovasi,
+      path: '/order/renovasi',
+    },
   ];
 
   return (
@@ -52,7 +60,7 @@ export default function HomePage() {
       <div className="w-full flex flex-col gap-5">
         
         {/* =========================================
-            HEADER KUNING (Saku BENERIN, Halo User, Panggil Sekarang, Cari Perbaikan)
+            HEADER KUNING (Saku TULINE, Halo User, Panggil Sekarang, Cari Perbaikan)
             Design presisi sesuai screenshot Figma
            ========================================= */}
         <section className="bg-[#ffde59] rounded-3xl p-5 sm:p-6 shadow-sm border border-yellow-300 flex flex-col gap-4">
@@ -98,7 +106,7 @@ export default function HomePage() {
               <div className="mt-2">
                 <button
                   type="button"
-                  onClick={() => navigate('/order/new')}
+                  onClick={() => navigate('/order/reparasi')}
                   className="bg-[#ff7f11] hover:bg-[#e06d0b] text-white text-xs sm:text-sm font-extrabold py-2 px-4 rounded-full shadow-md active:scale-95 transition cursor-pointer inline-flex items-center gap-1"
                 >
                   <span>Panggil Sekarang</span>
@@ -123,46 +131,42 @@ export default function HomePage() {
         </section>
 
         {/* =========================================
-            KATEGORI LAYANAN SECTION
-            Reparasi, Instalasi, Renovasi, Ledeng, Furnitur
+            3 PILIHAN UTAMA: REPARASI, INSTALASI, RENOVASI
+            Desain persis Gambar 2 / Figma (3 card di bawah Cari Perbaikan)
            ========================================= */}
         <section>
-          <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
-            {categories.map((cat) => {
-              const Icon = cat.icon;
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => handleCategoryClick(cat.id)}
-                  className="bg-white p-3.5 sm:p-4 rounded-2xl border border-gray-200/80 hover:border-[#ff7f11] shadow-2xs hover:shadow-md transition active:scale-95 flex flex-col items-center justify-center text-center gap-2 group cursor-pointer"
-                >
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${cat.color} group-hover:scale-110 transition border border-black/5`}>
-                    <Icon className="w-6 h-6 stroke-[2]" />
-                  </div>
-                  <div>
-                    <h3 className="text-xs sm:text-sm font-bold text-[#0c1b33]">
-                      {cat.name}
-                    </h3>
-                    <p className="text-[10px] text-gray-500 mt-0.5 line-clamp-1">
-                      {cat.subtitle}
-                    </p>
-                  </div>
-                </button>
-              );
-            })}
+          <div className="grid grid-cols-3 gap-3">
+            {mainActions.map((action) => (
+              <button
+                key={action.id}
+                onClick={() => handleActionClick(action.id)}
+                className="bg-white p-3.5 sm:p-5 rounded-2xl border border-gray-200/80 hover:border-[#ff7f11] shadow-2xs hover:shadow-md transition active:scale-95 flex flex-col items-center justify-center text-center gap-2.5 group cursor-pointer"
+              >
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl flex items-center justify-center p-1 group-hover:scale-105 transition">
+                  <img
+                    src={action.icon}
+                    alt={action.name}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <h3 className="text-xs sm:text-sm font-bold text-[#0c1b33] tracking-tight">
+                  {action.name}
+                </h3>
+              </button>
+            ))}
           </div>
         </section>
 
         {/* =========================================
             KONSULTASI AI SECTION
-            Kartu kuning dengan inner card Asisten AI BENERIN sesuai foto
+            Kartu kuning dengan inner card Asisten AI TULINE sesuai foto
            ========================================= */}
         <section
           onClick={() => navigate('/konsultasi-ai')}
           className="bg-[#ffde59] rounded-3xl p-4 sm:p-5 shadow-xs border border-yellow-300 cursor-pointer hover:shadow-md transition group"
         >
           <div className="flex items-center gap-2 mb-2.5">
-            <MessageCircle className="w-5 h-5 text-[#ff7f11]" />
+            <img src={iconAi} alt="Konsultasi AI" className="w-5 h-5 object-contain" />
             <h3 className="text-sm sm:text-base font-extrabold font-jakarta text-[#0c1b33]">
               Konsultasi Ai
             </h3>
@@ -188,7 +192,7 @@ export default function HomePage() {
         <section className="bg-[#ffde59] rounded-3xl p-4 sm:p-5 shadow-xs border border-yellow-300">
           <div className="flex items-center justify-between mb-2.5">
             <div className="flex items-center gap-2">
-              <Receipt className="w-5 h-5 text-[#ff7f11]" />
+              <img src={iconNota} alt="Nota" className="w-5 h-5 object-contain" />
               <h3 className="text-sm sm:text-base font-extrabold font-jakarta text-[#0c1b33]">
                 Nota
               </h3>

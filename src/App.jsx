@@ -119,6 +119,38 @@ export default function App() {
               }
             />
             <Route
+              path="/order/reparasi"
+              element={
+                <ProtectedRoute>
+                  <OrderCreatePage defaultAction="reparasi" />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/order/instalasi"
+              element={
+                <ProtectedRoute>
+                  <OrderCreatePage defaultAction="instalasi" />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/order/renovasi"
+              element={
+                <ProtectedRoute>
+                  <OrderCreatePage defaultAction="renovasi" />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/order/:actionType"
+              element={
+                <ProtectedRoute>
+                  <OrderCreatePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/teknisi"
               element={
                 <ProtectedRoute>
